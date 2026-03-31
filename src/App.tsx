@@ -2,6 +2,126 @@ import { useState, useEffect, useRef } from 'react';
 import { Code, BookOpen, Users, ChevronDown, ChevronUp, Play, CheckCircle2, Star, ArrowRight, Menu, X, Zap, Trophy, Target, TrendingUp } from 'lucide-react';
 import './App.css';
 
+// Roadmap Flow Component
+function RoadmapFlow() {
+  const nodes = [
+    { id: '1', label: 'Arrays & Hashing', x: 250, y: 50, progress: 100 },
+    { id: '2', label: 'Two Pointers', x: 150, y: 180, progress: 80 },
+    { id: '3', label: 'Stack', x: 350, y: 180, progress: 60 },
+    { id: '4', label: 'Sliding Window', x: 50, y: 310, progress: 40 },
+    { id: '5', label: 'Linked List', x: 250, y: 310, progress: 40 },
+    { id: '6', label: 'Binary Search', x: 450, y: 310, progress: 40 },
+    { id: '7', label: 'Trees', x: 250, y: 440, progress: 60 },
+    { id: '8', label: 'Tries', x: 100, y: 570, progress: 10 },
+    { id: '9', label: 'Heap / Priority Queue', x: 250, y: 570, progress: 5 },
+    { id: '10', label: 'Backtracking', x: 400, y: 570, progress: 0 },
+  ];
+
+  const connections = [
+    { from: '1', to: '2' },
+    { from: '1', to: '3' },
+    { from: '2', to: '4' },
+    { from: '2', to: '5' },
+    { from: '2', to: '6' },
+    { from: '5', to: '7' },
+    { from: '6', to: '7' },
+    { from: '7', to: '8' },
+    { from: '7', to: '9' },
+    { from: '7', to: '10' },
+  ];
+
+  return (
+    <div className="relative w-full max-w-[500px] h-[650px] mx-auto scale-[0.7] sm:scale-100 origin-center transition-all duration-700">
+      <svg viewBox="0 0 500 650" className="w-full h-full drop-shadow-2xl">
+        {/* Animated Paths */}
+        {connections.map((conn, i) => {
+          const fromNode = nodes.find(n => n.id === conn.from)!;
+          const toNode = nodes.find(n => n.id === conn.to)!;
+          
+          const startX = fromNode.x;
+          const startY = fromNode.y + 40;
+          const endX = toNode.x;
+          const endY = toNode.y - 40;
+          
+          const pathD = `M ${startX} ${startY} C ${startX} ${startY + 60}, ${endX} ${endY - 60}, ${endX} ${endY}`;
+          
+          return (
+            <g key={i}>
+              <path
+                d={pathD}
+                fill="none"
+                stroke="#333"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+              <path
+                d={pathD}
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="12 12"
+                className="animate-flow-dash"
+              />
+              <path
+                d={`M ${endX-5} ${endY-10} L ${endX} ${endY} L ${endX+5} ${endY-10}`}
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
+          );
+        })}
+
+        {/* Nodes */}
+        {nodes.map((node) => (
+          <g key={node.id} transform={`translate(${node.x - 75}, ${node.y - 35})`} className="group cursor-pointer">
+            <rect
+              width="150"
+              height="70"
+              rx="12"
+              fill="#2a4ae0"
+              className="group-hover:fill-[#3a5af0] transition-colors duration-300 drop-shadow-lg"
+            />
+            <text
+              x="75"
+              y="32"
+              textAnchor="middle"
+              fill="white"
+              className="text-[14px] font-bold select-none"
+              style={{ fontFamily: 'Space Grotesk' }}
+            >
+              {node.label}
+            </text>
+            
+            <rect
+              x="15"
+              y="45"
+              width="120"
+              height="8"
+              rx="4"
+              fill="white"
+              fillOpacity="0.2"
+            />
+            <rect
+              x="15"
+              y="45"
+              width={(node.progress / 100) * 120}
+              height="8"
+              rx="4"
+              fill="#4ade80"
+              className="transition-all duration-1000 ease-out"
+            />
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+
 // Hook for scroll reveal animations
 function useScrollReveal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -72,11 +192,11 @@ function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
-              <Code className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-3 group cursor-pointer">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-green-500/20">
+              <Code className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">NeetCode</span>
+            <span className="text-2xl font-bold text-white tracking-tight">NeetCode</span>
           </div>
 
           {/* Desktop Nav */}
@@ -135,74 +255,77 @@ function Navigation() {
 // Hero Section
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+    <section className="relative min-h-[110vh] flex items-center pt-20 overflow-hidden font-sans">
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0f1f0f] to-[#0a0a0a]" />
-
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-                           linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }} />
+      <div className="absolute inset-0 bg-[#0a0a0a]" />
+      
+      {/* Dynamic Background Noise/Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-30 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Glowing Orb */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl" />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-8 animate-fade-in">
-          <Zap className="w-4 h-4 text-green-400" />
-          <span className="text-sm text-green-400 font-medium">Trusted by 1M+ engineers worldwide</span>
-        </div>
-
-        {/* Main Headline */}
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight animate-slide-up">
-          A Better Way to
-          <span className="block bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-            Prepare
-          </span>
-        </h1>
-
-        {/* Subheadline */}
-        <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto mb-10 animate-slide-up-delay">
-          Tech interview roadmaps trusted by engineers at Google, Meta, OpenAI, and other top tech companies.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up-delay-2">
-          <button className="group px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold text-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-xl shadow-green-500/30 flex items-center space-x-2">
-            <span>Get Pro</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <button className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300 flex items-center space-x-2">
-            <Play className="w-5 h-5" />
-            <span>Start Practicing Free</span>
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-8 mt-16 max-w-2xl mx-auto animate-fade-in-delay">
-          <div className="text-center">
-            <div className="text-4xl sm:text-5xl font-bold text-white mb-2">
-              <AnimatedCounter end={1000} suffix="+" />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left Column: Content */}
+          <div className="text-left">
+            {/* Badge */}
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-8 hover:bg-green-500/20 transition-colors animate-fade-in group cursor-default">
+              <Zap className="w-4 h-4 text-green-400 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-green-400 font-medium tracking-wide">Trusted by 1M+ engineers worldwide</span>
             </div>
-            <p className="text-gray-500">Practice Problems</p>
+
+            {/* Main Headline */}
+            <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold text-white mb-8 leading-[1.1] animate-slide-up">
+              A Better Way <br />
+              to <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400">Prepare</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-xl sm:text-2xl text-gray-400 max-w-2xl mb-12 animate-slide-up-delay leading-relaxed">
+              Tech interview roadmaps trusted by engineers at the world's most innovative companies. Master DSA, System Design, and more.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-5 animate-slide-up-delay-2 mb-16">
+              <button className="w-full sm:w-auto group px-10 py-5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-500 transform hover:-translate-y-1 flex items-center justify-center space-x-3">
+                <span>Unlock NeetCode Pro</span>
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
+              </button>
+              <button className="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-3 backdrop-blur-sm">
+                <Play className="w-6 h-6 text-green-400" />
+                <span>Try for Free</span>
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-12 pt-8 border-t border-white/10 animate-fade-in-delay">
+              <div className="space-y-1">
+                <div className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+                  <AnimatedCounter end={1000} suffix="+" />
+                </div>
+                <p className="text-gray-500 font-medium uppercase tracking-widest text-xs">Practice Problems</p>
+              </div>
+              <div className="space-y-1">
+                <div className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+                  <AnimatedCounter end={1000} suffix="k+" />
+                </div>
+                <p className="text-gray-500 font-medium uppercase tracking-widest text-xs">Active Users</p>
+              </div>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="text-4xl sm:text-5xl font-bold text-white mb-2">
-              <AnimatedCounter end={1} suffix="M+" />
-            </div>
-            <p className="text-gray-500">Engineers Prepared</p>
+
+          {/* Right Column: Roadmap Animation */}
+          <div className="relative animate-fade-in-delay-2 hidden lg:block">
+            <div className="absolute inset-0 bg-green-500/5 blur-[120px] rounded-full" />
+            <RoadmapFlow />
           </div>
         </div>
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <ChevronDown className="w-8 h-8 text-gray-500" />
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-20">
+        <ChevronDown className="w-10 h-10 text-white" />
       </div>
     </section>
   );
@@ -253,10 +376,10 @@ function FeaturesSection() {
     <section id="courses" className="py-24 bg-[#0f0f0f]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+          <h2 className="text-4xl sm:text-6xl font-bold text-white mb-6">
             Master Every Topic
           </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
             Comprehensive coverage of all essential data structures and algorithms topics
           </p>
         </div>
@@ -341,16 +464,25 @@ function PracticeSection() {
                 <span className="ml-4 text-gray-500 text-sm">two-sum.py</span>
               </div>
               {/* Code Content */}
-              <div className="p-6 font-mono text-sm overflow-x-auto">
-                <pre className="text-gray-300"><span className="text-purple-400">class</span> <span className="text-yellow-400">Solution</span>:
-    <span className="text-purple-400">    def</span> <span className="text-cyan-400">twoSum</span>(<span className="text-purple-400">self</span>, nums: List[<span className="text-purple-400">int</span>], target: <span className="text-purple-400">int</span>) {'->'} List[<span className="text-purple-400">int</span>]:
-        seen = {'{}'}
-        <span className="text-purple-400">        for</span> i, num <span className="text-purple-400">in</span> <span className="text-purple-400">enumerate</span>(nums):
-            complement = target - num
-            <span className="text-purple-400">            if</span> complement <span className="text-purple-400">in</span> seen:
-                <span className="text-purple-400">                return</span> [seen[complement], i]
-            seen[num] = i
-        <span className="text-purple-400">        return</span> []</pre>
+              <div className="p-0 font-mono text-sm overflow-x-auto bg-[#0d0d0d]">
+                <div className="flex flex-col py-4">
+                  {[
+                    { number: 1, content: <><span className="text-purple-400">class</span> <span className="text-yellow-400">Solution</span>:</> },
+                    { number: 2, content: <><span className="ml-4"><span className="text-purple-400">def</span> <span className="text-cyan-400">twoSum</span>(<span className="text-purple-400">self</span>, nums: List[<span className="text-purple-400">int</span>], target: <span className="text-purple-400">int</span>) {'->'} List[<span className="text-purple-400">int</span>]:</span></> },
+                    { number: 3, content: <><span className="ml-8">seen = {'{}'}</span></> },
+                    { number: 4, content: <><span className="ml-8"><span className="text-purple-400">for</span> i, num <span className="text-purple-400">in</span> <span className="text-purple-400">enumerate</span>(nums):</span></> },
+                    { number: 5, content: <><span className="ml-12">complement = target - num</span></> },
+                    { number: 6, content: <><span className="ml-12"><span className="text-purple-400">if</span> complement <span className="text-purple-400">in</span> seen:</span></> },
+                    { number: 7, content: <><span className="ml-16"><span className="text-purple-400">return</span> [seen[complement], i]</span></> },
+                    { number: 8, content: <><span className="ml-12">seen[num] = i</span></> },
+                    { number: 9, content: <><span className="ml-8"><span className="text-purple-400">return</span> []</span></> },
+                  ].map((line) => (
+                    <div key={line.number} className="flex hover:bg-white/5 transition-colors group px-4">
+                      <span className="w-8 text-gray-600 text-xs text-right pr-4 select-none pt-1">{line.number}</span>
+                      <span className="text-gray-300 py-0.5">{line.content}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               {/* Status Bar */}
               <div className="flex items-center justify-between px-4 py-2 bg-[#252525] border-t border-white/5">
