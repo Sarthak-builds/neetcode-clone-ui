@@ -26,15 +26,16 @@ module.exports = {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#2B5D3A',
+					DEFAULT: '#8C6EE0',
+					hover: '#7B5CFF',
 					foreground: 'hsl(var(--primary-foreground))',
 				},
 				secondary: {
-					DEFAULT: '#4A90E2',
+					DEFAULT: '#2D2D2D',
 					foreground: 'hsl(var(--secondary-foreground))',
 				},
 				accent: {
-					DEFAULT: '#F5A623',
+					DEFAULT: '#9F7AEA',
 					foreground: 'hsl(var(--accent-foreground))',
 				},
 				destructive: {

@@ -1,5 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import { Code, BookOpen, Users, ChevronDown, ChevronUp, Play, CheckCircle2, Star, ArrowRight, Menu, X, Zap, Trophy, Target, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+  Code, ArrowRight, Play, CheckCircle2, ChevronRight, 
+  Github, Twitter, Linkedin, Trophy, Zap, TrendingUp, Target,
+  Menu, X, ChevronDown, ChevronUp, Star, Layout, BookOpen, Clock,
+  Terminal, Database, Monitor, Globe, Moon, Sun
+} from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 
 // Roadmap Flow Component
@@ -50,23 +57,23 @@ function RoadmapFlow() {
               <path
                 d={pathD}
                 fill="none"
-                stroke="#333"
+                stroke="rgba(255, 255, 255, 0.1)"
                 strokeWidth="4"
                 strokeLinecap="round"
               />
               <path
                 d={pathD}
                 fill="none"
-                stroke="#22c55e"
-                strokeWidth="4"
+                stroke="white"
+                strokeWidth="3"
                 strokeLinecap="round"
-                strokeDasharray="12 12"
-                className="animate-flow-dash"
+                strokeDasharray="8 12"
+                className="animate-flow-dash opacity-60"
               />
               <path
                 d={`M ${endX-5} ${endY-10} L ${endX} ${endY} L ${endX+5} ${endY-10}`}
                 fill="none"
-                stroke="#22c55e"
+                stroke="white"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -81,16 +88,16 @@ function RoadmapFlow() {
             <rect
               width="150"
               height="70"
-              rx="12"
-              fill="#2a4ae0"
-              className="group-hover:fill-[#3a5af0] transition-colors duration-300 drop-shadow-lg"
+              rx="16"
+              fill="#8C6EE0"
+              className="group-hover:fill-[#9B7DFF] transition-all duration-300 drop-shadow-[0_0_15px_rgba(140,110,224,0.3)]"
             />
             <text
               x="75"
               y="32"
               textAnchor="middle"
               fill="white"
-              className="text-[14px] font-bold select-none"
+              className="text-[13px] font-bold select-none"
               style={{ fontFamily: 'Space Grotesk' }}
             >
               {node.label}
@@ -100,8 +107,8 @@ function RoadmapFlow() {
               x="15"
               y="45"
               width="120"
-              height="8"
-              rx="4"
+              height="6"
+              rx="3"
               fill="white"
               fillOpacity="0.2"
             />
@@ -109,9 +116,9 @@ function RoadmapFlow() {
               x="15"
               y="45"
               width={(node.progress / 100) * 120}
-              height="8"
-              rx="4"
-              fill="#4ade80"
+              height="6"
+              rx="3"
+              fill="white"
               className="transition-all duration-1000 ease-out"
             />
           </g>
@@ -147,6 +154,112 @@ function useScrollReveal() {
   return { ref, isVisible };
 }
 
+// Floating Icon Component
+function FloatingIcon({ children, className, delay = 0, speed = 3 }: { children: React.ReactNode; className?: string; delay?: number; speed?: number }) {
+  return (
+    <div 
+      className={`absolute pointer-events-none animate-float ${className}`}
+      style={{ 
+        animationDelay: `${delay}s`,
+        animationDuration: `${speed}s`,
+      }}
+    >
+      <div className="relative group">
+        {/* Subtle, soft glow */}
+        <div className="absolute inset-[-20%] bg-primary/10 blur-2xl rounded-full scale-150 group-hover:bg-primary/20 transition-colors" />
+        <div className="relative transform hover:rotate-0 transition-transform duration-500 hover:scale-105">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Background Beams Component (Aceternity UI spec)
+function BackgroundBeams({ className }: { className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Generating a grid of lines
+  const lines = useMemo(() => {
+    return Array.from({ length: 40 }).map((_, i) => ({
+      id: i,
+      x: i * 2.5,
+      delay: Math.random() * 5,
+      duration: 3 + Math.random() * 3,
+    }));
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`absolute inset-0 overflow-hidden pointer-events-none z-0 antialiased ${className}`}
+    >
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="w-full h-full opacity-[0.2] dark:opacity-[0.3]"
+      >
+        {/* Horizontal Lines (Grid like) */}
+        {Array.from({ length: 30 }).map((_, i) => (
+          <line
+            key={`h-${i}`}
+            x1="0"
+            y1={i * 3.33}
+            x2="100"
+            y2={i * 3.33}
+            stroke="currentColor"
+            strokeWidth="0.05"
+            className="text-primary/10"
+          />
+        ))}
+        {/* Vertical Lines */}
+        {lines.map((line) => (
+          <line
+            key={`v-${line.id}`}
+            x1={line.x}
+            y1="0"
+            x2={line.x}
+            y2="100"
+            stroke="currentColor"
+            strokeWidth="0.1"
+            className="text-primary/10"
+          />
+        ))}
+      </svg>
+
+      {/* Animated Beams */}
+      <div className="absolute inset-0">
+        {lines.map((line, i) => (
+          i % 3 === 0 && (
+            <motion.div
+              key={`beam-${line.id}`}
+              initial={{ top: "-20%", opacity: 0 }}
+              animate={{
+                top: ["-20%", "120%"],
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{
+                duration: line.duration,
+                repeat: Infinity,
+                delay: line.delay,
+                ease: "linear",
+              }}
+              className="absolute w-[3px] h-48 bg-gradient-to-b from-transparent via-primary to-transparent"
+              style={{ 
+                left: `${line.x}%`,
+                filter: 'drop-shadow(0 0 15px rgba(140, 110, 224, 0.9))'
+              }}
+            />
+          )
+        ))}
+      </div>
+      
+      {/* Subtle Radial Mask to soften edges but not hide beams */}
+      <div className="absolute inset-0 bg-background/30 [mask-image:radial-gradient(ellipse_at_center,transparent_0%,black_100%)] pointer-events-none" />
+    </div>
+  );
+}
+
 // Animated Counter Component
 function AnimatedCounter({ end, duration = 2000, suffix = '' }: { end: number; duration?: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -170,6 +283,26 @@ function AnimatedCounter({ end, duration = 2000, suffix = '' }: { end: number; d
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
+// Theme Toggle Component
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return (
+    <button
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-all border border-primary/20"
+      aria-label="Toggle theme"
+    >
+      {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+    </button>
+  );
+}
+
 // Navigation Component
 function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -187,44 +320,48 @@ function Navigation() {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+      isScrolled ? 'bg-background/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <div className="flex items-center space-x-3 group cursor-pointer">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-green-500/20">
-              <Code className="w-6 h-6 text-white" />
+            <div className="w-9 h-9 bg-primary border-b-2 border-black/20 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-primary/20">
+              <Code className="w-5 h-5 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white tracking-tight">NeetCode</span>
+            <span className="text-xl font-bold text-foreground tracking-tight">NeetCode</span>
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6">
             {navItems.map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium"
+                className="text-gray-400 hover:text-foreground transition-colors duration-200 text-sm font-medium"
               >
                 {item}
               </a>
             ))}
-            <button className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200">
+            <ThemeToggle />
+            <button className="px-3 py-1.5 text-sm font-medium text-gray-400 hover:text-foreground transition-colors duration-200">
               Sign in
             </button>
-            <button className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-medium text-sm hover:from-green-600 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-green-500/25">
+            <button className="px-4 py-2 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary-hover transition-all duration-200 transform hover:scale-105 shadow-lg shadow-primary/20">
               Get Pro
             </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 text-gray-300"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="lg:hidden flex items-center gap-4">
+            <ThemeToggle />
+            <button
+              className="p-2 text-gray-400"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -232,18 +369,18 @@ function Navigation() {
       <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
         isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
       }`}>
-        <div className="bg-[#0a0a0a]/95 backdrop-blur-md px-4 py-4 space-y-4">
+        <div className="bg-background/95 backdrop-blur-md px-4 py-4 space-y-4">
           {navItems.map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
-              className="block text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium py-2"
+              className="block text-gray-400 hover:text-foreground transition-colors duration-200 text-sm font-medium py-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {item}
             </a>
           ))}
-          <button className="w-full px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-medium text-sm">
+          <button className="w-full px-5 py-2 bg-primary text-white rounded-lg font-bold text-sm">
             Get Pro
           </button>
         </div>
@@ -254,78 +391,108 @@ function Navigation() {
 
 // Hero Section
 function HeroSection() {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section className="relative min-h-[110vh] flex items-center pt-20 overflow-hidden font-sans">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-[#0a0a0a]" />
+    <section className="relative min-h-screen pt-32 pb-20 overflow-hidden font-sans">
+      {/* Aceternity Background Beams */}
+      <BackgroundBeams />
       
-      {/* Dynamic Background Noise/Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-30 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]" />
+      {/* Background Overlay to ensure readability */}
+      <div className="absolute inset-0 bg-background/50 dark:bg-[#080808]/50 z-[1]" />
+      <div className="absolute inset-0 bg-background dark:bg-[#080808] z-0" />
+      
+      {/* Original Scroll Animated Background Shade */}
+      <div 
+        className="absolute inset-0 opacity-20 pointer-events-none transition-transform duration-300 ease-out z-[2]"
+        style={{ 
+          transform: `translateY(${scrollY * 0.2}px)`,
+        }}
+      >
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-primary/20 rounded-full blur-[140px] animate-pulse" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left Column: Content */}
-          <div className="text-left">
-            {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-8 hover:bg-green-500/20 transition-colors animate-fade-in group cursor-default">
-              <Zap className="w-4 h-4 text-green-400 group-hover:scale-110 transition-transform" />
-              <span className="text-sm text-green-400 font-medium tracking-wide">Trusted by 1M+ engineers worldwide</span>
-            </div>
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-full mb-12 cursor-default group hover:border-primary/40 transition-colors">
+          <Trophy className="w-3 h-3 text-primary" />
+          <span className="text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em]">Trusted by 1M+ Top Engineers</span>
+          <span className="text-xs">🔥</span>
+        </div>
 
-            {/* Main Headline */}
-            <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold text-white mb-8 leading-[1.1] animate-slide-up">
-              A Better Way <br />
-              to <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400">Prepare</span>
-            </h1>
+        {/* Main Headline */}
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-8 leading-[1.1] animate-slide-up max-w-5xl mx-auto">
+          A better way to prepare for <br className="hidden sm:block" />
+          your <span className="text-primary italic">technical interviews</span>
+        </h1>
 
-            {/* Subheadline */}
-            <p className="text-xl sm:text-2xl text-gray-400 max-w-2xl mb-12 animate-slide-up-delay leading-relaxed">
-              Tech interview roadmaps trusted by engineers at the world's most innovative companies. Master DSA, System Design, and more.
-            </p>
+        {/* Subheadline */}
+        <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-20 animate-slide-up-delay leading-relaxed font-medium">
+          The ultimate roadmap used by developers to land jobs at Google, Meta, and Amazon. Master DSA, System Design, and more.
+        </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center gap-5 animate-slide-up-delay-2 mb-16">
-              <button className="w-full sm:w-auto group px-10 py-5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-500 transform hover:-translate-y-1 flex items-center justify-center space-x-3">
-                <span>Unlock NeetCode Pro</span>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
-              </button>
-              <button className="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-3 backdrop-blur-sm">
-                <Play className="w-6 h-6 text-green-400" />
-                <span>Try for Free</span>
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-12 pt-8 border-t border-white/10 animate-fade-in-delay">
-              <div className="space-y-1">
-                <div className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
-                  <AnimatedCounter end={1000} suffix="+" />
-                </div>
-                <p className="text-gray-500 font-medium uppercase tracking-widest text-xs">Practice Problems</p>
-              </div>
-              <div className="space-y-1">
-                <div className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
-                  <AnimatedCounter end={1000} suffix="k+" />
-                </div>
-                <p className="text-gray-500 font-medium uppercase tracking-widest text-xs">Active Users</p>
-              </div>
+        {/* Visual Showcase (Inspired by image) */}
+        <div className="relative max-w-6xl mx-auto animate-fade-in-delay-2">
+          {/* Main Showcase Area */}
+          <div className="relative rounded-[2rem] overflow-hidden border border-white/5 bg-black/20 backdrop-blur-sm p-4 sm:p-8">
+            <div className="relative z-10">
+              <RoadmapFlow />
             </div>
           </div>
 
-          {/* Right Column: Roadmap Animation */}
-          <div className="relative animate-fade-in-delay-2 hidden lg:block">
-            <div className="absolute inset-0 bg-green-500/5 blur-[120px] rounded-full" />
-            <RoadmapFlow />
-          </div>
+          {/* Floating Elements Around the Window (Colorful/Enhanced) */}
+          <FloatingIcon className="top-[-60px] left-[-30px] sm:left-[-140px]" delay={0} speed={4}>
+            <div className="p-6 sm:p-8 bg-primary/20 dark:bg-primary/20 backdrop-blur-3xl border border-primary/20 rounded-[2.5rem] transform -rotate-12 group-hover:rotate-0 transition-all duration-700">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full flex items-center justify-center mb-6 border border-white/10">
+                <Trophy className="w-9 h-9 sm:w-11 sm:h-11 text-white drop-shadow-lg" />
+              </div>
+              <div className="space-y-3 text-left">
+                <div className="w-24 sm:w-32 h-2.5 bg-white/20 rounded-full" />
+                <div className="w-16 sm:w-20 h-2.5 bg-white/10 rounded-full" />
+              </div>
+            </div>
+          </FloatingIcon>
+
+          <FloatingIcon className="bottom-[-40px] right-[-30px] sm:right-[-140px]" delay={1.5} speed={5}>
+            <div className="p-7 sm:p-9 bg-primary/20 dark:bg-primary/20 backdrop-blur-3xl border border-primary/20 rounded-[2.5rem] transform rotate-12 group-hover:rotate-0 transition-all duration-700">
+              <div className="flex items-center space-x-6 mb-6">
+                <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-primary border border-white/10 flex items-center justify-center">
+                  <Star className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="text-white font-extrabold text-lg sm:text-xl tracking-tight">150+ Solved</div>
+                  <div className="text-white/60 text-xs sm:text-sm font-bold tracking-wide">Daily Streak: 42 🔥</div>
+                </div>
+              </div>
+              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden border border-white/10">
+                <div className="w-[70%] h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
+              </div>
+            </div>
+          </FloatingIcon>
+
+          <FloatingIcon className="top-[10%] right-[-15%] hidden md:block" delay={2} speed={6}>
+            <div className="p-6 bg-primary border border-white/20 rounded-2xl shadow-none">
+              <Zap className="w-8 h-8 text-white fill-white/20" />
+            </div>
+          </FloatingIcon>
+
+          <FloatingIcon className="bottom-[40%] left-[-20%] hidden md:block" delay={3} speed={7}>
+            <div className="p-6 bg-primary/40 border border-white/10 backdrop-blur-md rounded-2xl shadow-none">
+              <Code className="w-8 h-8 text-white" />
+            </div>
+          </FloatingIcon>
         </div>
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-20">
-        <ChevronDown className="w-10 h-10 text-white" />
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-30">
+        <ChevronDown className="w-8 h-8 text-white" />
       </div>
     </section>
   );
@@ -336,20 +503,19 @@ function TrustedCompanies() {
   const companies = ['Google', 'Meta', 'Amazon', 'Microsoft', 'Netflix', 'OpenAI', 'Anthropic'];
 
   return (
-    <section className="py-16 bg-[#0a0a0a] border-y border-white/5">
+    <section className="py-20 bg-background border-y border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-gray-500 mb-8 text-sm uppercase tracking-wider">
-          Trusted by engineers at
+        <p className="text-center text-gray-500 text-[10px] font-bold uppercase tracking-[0.4em] mb-12 opacity-50">
+          Trusted by developers at
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-          {companies.map((company, index) => (
-            <div
+        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-8 md:gap-x-20">
+          {companies.map((company) => (
+            <span
               key={company}
-              className="text-gray-400 text-xl sm:text-2xl font-semibold hover:text-white transition-colors duration-300"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="text-gray-400 font-bold text-xl md:text-2xl hover:text-primary transition-all duration-300 cursor-default"
             >
               {company}
-            </div>
+            </span>
           ))}
         </div>
       </div>
@@ -375,18 +541,18 @@ function FeaturesSection() {
   return (
     <section id="courses" className="py-24 bg-[#0f0f0f]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-6xl font-bold text-white mb-6">
-            Master Every Topic
+        <div className="text-center mb-20">
+          <h2 className="text-3xl sm:text-5xl font-bold text-foreground mb-6">
+            Master Every <span className="gradient-text">Topic</span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Comprehensive coverage of all essential data structures and algorithms topics
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed font-medium">
+            Comprehensive coverage of all essential data structures and algorithms topics, designed to make you an expert.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {features.map((feature, index) => (
-            <FeatureCard key={feature.name} feature={feature} index={index} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {features.map((feature, i) => (
+            <FeatureCard key={feature.name} feature={feature} index={i} />
           ))}
         </div>
       </div>
@@ -400,15 +566,19 @@ function FeatureCard({ feature, index }: { feature: { name: string; icon: string
   return (
     <div
       ref={ref}
-      className={`group relative p-6 bg-[#1a1a1a] rounded-2xl border border-white/5 hover:border-green-500/30 transition-all duration-300 hover:transform hover:scale-105 ${
+      className={`group relative p-6 bg-card rounded-2xl border border-border hover:border-primary/40 transition-all duration-500 hover:transform hover:-translate-y-2 shadow-sm hover:shadow-xl hover:shadow-primary/5 ${
         isVisible ? 'animate-slide-up' : 'opacity-0'
       }`}
-      style={{ animationDelay: `${index * 50}ms` }}
+      style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
-        {feature.icon}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+      <div className="relative z-10">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl mb-5 group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+          <span className="filter transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(140,110,224,0.5)]">{feature.icon}</span>
+        </div>
+        <h3 className="text-foreground font-bold text-sm tracking-tight mb-2 group-hover:text-primary transition-colors">{feature.name}</h3>
+        <div className="w-8 h-1 bg-primary/20 rounded-full group-hover:w-full transition-all duration-500" />
       </div>
-      <h3 className="text-white font-medium text-sm">{feature.name}</h3>
     </div>
   );
 }
@@ -420,33 +590,33 @@ function PracticeSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Start Practicing
-              <span className="block text-green-400">for Free</span>
+              <span className="block text-primary">for Free</span>
             </h2>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-lg text-gray-400 mb-6">
               The best resources for coding interviews. Period.
             </p>
 
-            <div className="space-y-4 mb-8">
+            <div className="space-y-3 mb-8">
               {[
                 'Organized study plans: Blind 75, NeetCode 150, NeetCode 250',
                 'Detailed video explanations for every problem',
                 'Track your progress and stay motivated',
                 'Join our public Discord community'
               ].map((item, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <CheckCircle2 className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <div key={index} className="flex items-start space-x-3 text-sm">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-gray-300">{item}</span>
                 </div>
               ))}
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <button className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-green-500/25">
+              <button className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-hover transition-all duration-300 transform hover:scale-105 shadow-lg shadow-primary/20">
                 Start Practicing
               </button>
-              <button className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-all duration-300">
+              <button className="px-6 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl font-bold text-sm hover:bg-white/10 transition-all duration-300">
                 View Roadmap
               </button>
             </div>
@@ -454,17 +624,17 @@ function PracticeSection() {
 
           {/* Code Preview */}
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 blur-3xl rounded-3xl" />
-            <div className="relative bg-[#1a1a1a] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-3xl" />
+            <div className="relative bg-[#111111] rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
               {/* Window Header */}
-              <div className="flex items-center space-x-2 px-4 py-3 bg-[#252525] border-b border-white/5">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="ml-4 text-gray-500 text-sm">two-sum.py</span>
+              <div className="flex items-center space-x-2 px-4 py-2.5 bg-[#1a1a1a] border-b border-white/5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                <span className="ml-4 text-gray-500 text-[11px] font-mono">two-sum.py</span>
               </div>
               {/* Code Content */}
-              <div className="p-0 font-mono text-sm overflow-x-auto bg-[#0d0d0d]">
+              <div className="p-0 font-mono text-[13px] overflow-x-auto bg-[#0a0a0a]">
                 <div className="flex flex-col py-4">
                   {[
                     { number: 1, content: <><span className="text-purple-400">class</span> <span className="text-yellow-400">Solution</span>:</> },
@@ -478,22 +648,22 @@ function PracticeSection() {
                     { number: 9, content: <><span className="ml-8"><span className="text-purple-400">return</span> []</span></> },
                   ].map((line) => (
                     <div key={line.number} className="flex hover:bg-white/5 transition-colors group px-4">
-                      <span className="w-8 text-gray-600 text-xs text-right pr-4 select-none pt-1">{line.number}</span>
+                      <span className="w-8 text-gray-700 text-[10px] text-right pr-4 select-none pt-1">{line.number}</span>
                       <span className="text-gray-300 py-0.5">{line.content}</span>
                     </div>
                   ))}
                 </div>
               </div>
               {/* Status Bar */}
-              <div className="flex items-center justify-between px-4 py-2 bg-[#252525] border-t border-white/5">
-                <div className="flex items-center space-x-4 text-sm">
-                  <span className="text-green-400 flex items-center space-x-1">
-                    <CheckCircle2 className="w-4 h-4" />
+              <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1a] border-t border-white/5">
+                <div className="flex items-center space-x-4 text-[11px]">
+                  <span className="text-primary flex items-center space-x-1 font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Accepted</span>
                   </span>
                   <span className="text-gray-500">O(n) time</span>
                 </div>
-                <span className="text-gray-500 text-sm">Easy</span>
+                <span className="text-gray-500 text-[11px]">Easy</span>
               </div>
             </div>
           </div>
@@ -513,7 +683,7 @@ function CoursesSection() {
         { name: 'Algorithms & Data Structures for Beginners', duration: '25 hours', difficulty: 'Medium' },
         { name: 'Advanced Algorithms', duration: '25 hours', difficulty: 'Hard' },
       ],
-      color: 'from-green-500 to-emerald-600',
+      color: 'from-primary to-accent',
     },
     {
       title: 'System Design',
@@ -522,7 +692,7 @@ function CoursesSection() {
         { name: 'System Design for Beginners', duration: '10 hours', difficulty: 'Medium' },
         { name: 'System Design Interview', duration: '10 hours', difficulty: 'Medium' },
       ],
-      color: 'from-blue-500 to-cyan-600',
+      color: 'from-[#4F46E5] to-[#7C3AED]',
     },
     {
       title: 'Python',
@@ -532,7 +702,7 @@ function CoursesSection() {
         { name: 'Python for Coding Interviews', duration: '8 hours', difficulty: 'Easy' },
         { name: 'Python OOP', duration: '8 hours', difficulty: 'Easy' },
       ],
-      color: 'from-yellow-500 to-orange-600',
+      color: 'from-accent to-[#B794F4]',
     },
   ];
 
@@ -540,10 +710,10 @@ function CoursesSection() {
     <section className="py-24 bg-[#0f0f0f]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Structured Learning Paths
           </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto font-medium">
             From beginner to advanced, follow courses designed to take you from zero to interview-ready
           </p>
         </div>
@@ -579,9 +749,9 @@ function CourseCard({ course, index }: { course: { title: string; description: s
               <span className="text-gray-300 text-sm">{item.name}</span>
               <div className="flex items-center space-x-2">
                 <span className="text-xs text-gray-500">{item.duration}</span>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  item.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400' :
-                  item.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  item.difficulty === 'Easy' ? 'bg-primary/20 text-primary' :
+                  item.difficulty === 'Medium' ? 'bg-accent/20 text-accent' :
                   'bg-red-500/20 text-red-400'
                 }`}>
                   {item.difficulty}
@@ -631,24 +801,24 @@ function TestimonialCard({ testimonial, index }: { testimonial: { name: string; 
   return (
     <div
       ref={ref}
-      className={`bg-[#1a1a1a] rounded-2xl p-6 border border-white/5 hover:border-green-500/30 transition-all duration-300 ${
+      className={`bg-[#111111] rounded-2xl p-6 border border-white/5 hover:border-primary/30 transition-all duration-300 ${
         isVisible ? 'animate-slide-up' : 'opacity-0'
       }`}
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className="flex items-center mb-4">
         {[...Array(5)].map((_, i) => (
-          <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+          <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
         ))}
       </div>
-      <p className="text-gray-300 mb-6 italic">"{testimonial.text}"</p>
+      <p className="text-gray-400 mb-6 italic text-sm leading-relaxed">"{testimonial.text}"</p>
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-semibold">
+        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
           {testimonial.name[0]}
         </div>
         <div>
-          <p className="text-white font-medium">{testimonial.name}</p>
-          <p className="text-green-400 text-sm">{testimonial.company}</p>
+          <p className="text-white font-bold text-sm">{testimonial.name}</p>
+          <p className="text-primary text-xs font-medium">{testimonial.company}</p>
         </div>
       </div>
     </div>
@@ -658,25 +828,25 @@ function TestimonialCard({ testimonial, index }: { testimonial: { name: string; 
 // Founder Section
 function FounderSection() {
   return (
-    <section className="py-24 bg-[#0f0f0f]">
+    <section className="py-24 bg-[#0a0a0a]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#252525] rounded-3xl p-8 sm:p-12 border border-white/5 relative overflow-hidden">
+        <div className="bg-[#111111] rounded-3xl p-8 sm:p-10 border border-white/5 relative overflow-hidden">
           {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
 
           <div className="relative z-10">
             <div className="flex items-center space-x-6 mb-8">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white text-3xl font-bold">
+              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-2xl font-bold">
                 N
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white">About the Founder</h3>
-                <p className="text-green-400">Navi</p>
-                <p className="text-gray-500 text-sm">Previously: Google, Amazon, Capital One</p>
+                <h3 className="text-xl font-bold text-white">About the Founder</h3>
+                <p className="text-primary font-bold text-sm">Navi</p>
+                <p className="text-gray-500 text-xs font-medium">Previously: Google, Amazon, Capital One</p>
               </div>
             </div>
 
-            <blockquote className="text-xl sm:text-2xl text-gray-300 leading-relaxed mb-8">
+            <blockquote className="text-lg sm:text-xl text-gray-300 leading-relaxed mb-8 font-medium italic">
               "I created NeetCode in 2020 when I was unemployed and couldn't find a job. While I was struggling myself, it was still rewarding for me to make videos. I received so many messages from others who got jobs after studying with my videos. I felt so gratifying and kept me motivated. About a year later I managed to get a job at Google."
             </blockquote>
           </div>
@@ -732,11 +902,11 @@ function FAQSection() {
                 className="w-full px-6 py-4 flex items-center justify-between text-left"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
               >
-                <span className="text-white font-medium pr-4">{faq.question}</span>
+                <span className="text-white font-bold text-sm pr-4">{faq.question}</span>
                 {openIndex === index ? (
-                  <ChevronUp className="w-5 h-5 text-green-400 flex-shrink-0" />
+                  <ChevronUp className="w-4 h-4 text-primary flex-shrink-0" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 )}
               </button>
               <div className={`px-6 overflow-hidden transition-all duration-300 ${
@@ -757,32 +927,37 @@ function CTASection() {
   return (
     <section className="py-24 bg-[#0f0f0f]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-3xl p-12 text-center border border-green-500/20 overflow-hidden">
+        <div className="relative bg-[#111111] rounded-3xl p-10 text-center border border-white/5 overflow-hidden">
           {/* Background decoration */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[100px]" />
 
           <div className="relative z-10">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/20 rounded-full mb-6">
-              <Trophy className="w-5 h-5 text-green-400" />
-              <span className="text-green-400 font-medium">Join 1M+ successful engineers</span>
+            <div className="inline-flex items-center space-x-3 px-5 py-2.5 bg-black rounded-full mb-8 group relative cursor-default">
+              {/* Outer Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/50 via-primary/30 to-primary/50 blur-md opacity-70 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-[-1px] rounded-full bg-gradient-to-r from-primary/20 to-primary/20" />
+              
+              <div className="relative flex items-center space-x-2">
+                <span className="text-[13px] text-white font-bold tracking-wide">Crafted By Top Engineers</span>
+                <span className="text-sm">🔥</span>
+              </div>
             </div>
 
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Ready to Land Your
-              <span className="block text-green-400">Dream Job?</span>
+              <span className="block text-primary">Dream Job?</span>
             </h2>
 
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto font-medium">
               Start your journey today with NeetCode Pro and get access to everything you need to ace your next technical interview.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="group px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold text-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-xl shadow-green-500/30 flex items-center space-x-2">
+              <button className="group px-8 py-3 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary-hover transition-all duration-300 transform hover:scale-105 shadow-xl shadow-primary/20 flex items-center space-x-2">
                 <span>Get NeetCode Pro</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300">
+              <button className="px-8 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold text-base hover:bg-white/10 transition-all duration-300">
                 Try Free First
               </button>
             </div>
@@ -808,12 +983,12 @@ function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Code className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">NeetCode</span>
+              <span className="text-xl font-bold text-white tracking-tight">NeetCode</span>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-xs font-medium leading-relaxed">
               A better way to prepare for your technical interviews.
             </p>
           </div>
